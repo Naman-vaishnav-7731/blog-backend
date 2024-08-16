@@ -25,7 +25,7 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 
-mongoose.connect("mongodb+srv://root:fAUBrmNu7hTumPPV@cluster0.bgn472i.mongodb.net/?retryWrites=true&w=majority").then(() => {
+mongoose.connect(process.env.MONGO_URL).then(() => {
   console.log("MongooDB is connected");
 }).catch((er) => {
   console.log(er)
