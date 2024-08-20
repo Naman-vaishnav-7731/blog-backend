@@ -2,7 +2,7 @@ import Blog from '../models/blog.js';
 import User from '../models/user.js';
 import mongoose from 'mongoose';
 
-const addBlog = async (req, res) => {
+const addBlog = async (req, res, next) => {
    try {
     
     const { title, description, userId } = req.body;
@@ -10,7 +10,8 @@ const addBlog = async (req, res) => {
      const user = await User.findById(userId);
 
      if (!user) {
-         return res.json({ message: 'User not found', code: 404 });
+        next({ message : 'User not found', code: 404 })
+        return;
      }
 
       const newBlog = new Blog({
@@ -25,12 +26,11 @@ const addBlog = async (req, res) => {
     
    } catch (error) {
     console.error(error);
-    return res.json({ message: 'Internal Server Error', code: 500 });
+    next(error);
    }
-
 }
 
-const getAllBlogs = async (req, res) => {
+const getAllBlogs = async (req, res, next) => {
    try {
 
     const { userId } = req.params;
@@ -63,16 +63,17 @@ const getAllBlogs = async (req, res) => {
     
    } catch (error) {
       console.error(error);
-      return res.json({ message: 'Internal Server Error', code: 500 });
+      next(error);
    }
 }
 
-const getSingleBlog = async (req, res) => {
+const getSingleBlog = async (req, res, next) => {
     try {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.json({ message: 'Invalid blog ID', code: 400 });
+            next({ message : 'Invalid blog ID', code: 400 })
+            return;
         }
 
         const blog = await Blog.findById(id).populate('author', 'email, firstname lastname');
@@ -84,16 +85,17 @@ const getSingleBlog = async (req, res) => {
         
     } catch (error) {
         console.error(error);
-        return res.json({ message: 'Internal Server Error', code: 500 });
+        next(error);
     }
 }
 
-const deleteBlog = async (req, res) => {
+const deleteBlog = async (req, res, next) => {
     try {
       const { id } = req.params;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.json({ message: 'Invalid blog ID', code: 400 });
+        next({ message : 'Invalid blog ID', code: 400 })
+        return;
       }
 
       await Blog.findByIdAndDelete(id);
@@ -102,18 +104,19 @@ const deleteBlog = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.json({ message: 'Internal Server Error', code: 500 });
+        next(error);
     }
 }
 
-const updateBlog = async (req, res) => {
+const updateBlog = async (req, res, next) => {
    try {
 
     const { id } = req.params;
     const { title, description } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.json({ message: 'Invalid blog ID', code: 400 });
+        next({ message : 'Invalid blog ID', code: 400 })
+        return;
     }
     
     const blog = await Blog.findById(id);
@@ -127,9 +130,8 @@ const updateBlog = async (req, res) => {
 
    } catch (error) {
     console.error(error);
-    return res.json({ message: 'Internal Server Error', code: 500 });
+    next(error);
    }
-   
 }
 
 export { getAllBlogs, getSingleBlog, deleteBlog, updateBlog, addBlog };
