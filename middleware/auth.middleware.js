@@ -19,14 +19,14 @@ const checkAuth = async (req, res, next) => {
             return
         }
 
-        const userObj = verifyToken(token, next)
+        const userObj = verifyToken(token, next);
 
-        if (!userObj?.userId) {
+        if (!userObj?.payload) {
             next({ status: 403, message: JWT_DECODE_ERR })
             return
         }
 
-        const user = await User.findById(userObj?.userId)
+        const user = await User.findById(userObj?.payload)
 
         if (!user) {
             next({status: 404, message: USER_NOT_FOUND_ERR })
